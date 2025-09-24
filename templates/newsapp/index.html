@@ -36,7 +36,10 @@
                         {{ article.content|truncatewords:40 }}
                     </p>
                 </div>
-                
+                 <a href="{% url 'article_detail' article.id %}" 
+                   class="text-red-600 font-medium hover:underline self-start">
+                    Read More →
+                </a>
             </div>
         </div>
         {% empty %}
