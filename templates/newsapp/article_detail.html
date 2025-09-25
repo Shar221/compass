@@ -15,7 +15,7 @@
 
     <!-- Writer & Time -->
     <p class="text-sm text-gray-500 mb-6">
-        By <span class="font-medium">{{ article.writer }}</span> • 
+        By <span class="font-medium">{{ article.writer.get_display_name }}</span> • 
         <span class="text-gray-400">{{ article.published_at|timesince }} ago</span>
     </p>
 

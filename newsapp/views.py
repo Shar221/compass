@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import NewsArticle, Writer, Category, Comment
+from .models import NewsArticle, Category, Comment
 
 def index(request):
     articles = NewsArticle.objects.all().order_by('-published_at')[:5]
@@ -13,3 +13,4 @@ def article_detail(request, article_id):
     context = {'article': article, 'comments': comments}
     
     return render(request, 'newsapp/article_detail.html', context)
+
