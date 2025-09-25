@@ -12,4 +12,4 @@ def article_detail(request, article_id):
     comments = article.comments.all().order_by('-created_at')
     context = {'article': article, 'comments': comments}
     
-    return render(request, 'newsapp/article_detail.html', context)  
+    return render(request, 'newsapp/article_detail.html', context)

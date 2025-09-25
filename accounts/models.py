@@ -16,6 +16,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault('role', CustomUser.UserRole.ADMIN)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -25,10 +26,18 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    class UserRole(models.TextChoices):
+        ADMIN = 'ADMIN', 'Admin'
+        EDITOR = 'EDITOR', 'Editor'
+        WRITER = 'WRITER', 'Writer'
+        VIEWER = 'VIEWER', 'Viewer'
+        
+        
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=150, unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
+    role = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.VIEWER)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -40,6 +49,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username if self.username else self.email
+
+    # Role check methods
+    def is_admin(self):
+        return self.role == self.UserRole.ADMIN
+    
+    def is_editor(self):
+        return self.role == self.UserRole.EDITOR
+    
+    def is_writer(self):
+        return self.role == self.UserRole.WRITER
+    
+    def is_viewer(self):
+        return self.role == self.UserRole.VIEWER
 
 class Profile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
