@@ -41,3 +41,11 @@ class UserRegistrationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+    
+class UserLoginForm(forms.Form):
+    email = forms.EmailField(widget=forms.EmailInput(
+        attrs={'class': 'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'}
+    ))
+    password = forms.CharField(widget=forms.PasswordInput(
+        attrs={'class': 'w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600'}
+    ))
