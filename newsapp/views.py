@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect   
+from django.shortcuts import render, redirect, get_object_or_404   
 from .models import NewsArticle, Category, Comment
 from .forms import NewsArticleForm, UpdateNewsArticleForm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
 
 def index(request):
     articles = NewsArticle.objects.all().order_by('-published_at')[:5]
@@ -15,7 +17,12 @@ def article_detail(request, article_id):
     
     return render(request, 'newsapp/article_detail.html', context)
 
+@login_required
 def create_news_article(request):
+    # Only Admin, Editor, or Writer can create
+    if request.user.role not in ["ADMIN", "EDITOR", "WRITER"]:
+        return HttpResponseForbidden("You do not have permission to create articles.")
+
     if request.method == 'POST':
         form = NewsArticleForm(request.POST, request.FILES)
         if form.is_valid():
@@ -28,8 +35,19 @@ def create_news_article(request):
     
     return render(request, 'newsapp/create_article.html', {'form': form})
 
+
+@login_required
 def update_news_article(request, article_id):
-    article = NewsArticle.objects.get(id=article_id)
+    article = get_object_or_404(NewsArticle, id=article_id)
+
+    # Permissions:
+    # - Admin and Editor can edit any article
+    # - Writer can only edit their own article
+    if request.user.role == "VIEWER":
+        return HttpResponseForbidden("You do not have permission to edit articles.")
+    if request.user.role == "WRITER" and article.writer != request.user:
+        return HttpResponseForbidden("You can only edit your own articles.")
+
     if request.method == 'POST':
         form = UpdateNewsArticleForm(request.POST, request.FILES, instance=article)
         if form.is_valid():
